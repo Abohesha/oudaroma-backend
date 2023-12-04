@@ -1,5 +1,6 @@
 const express = require('express')
-const Item = require('../Models/Item.js')
+const Item = require('../Models/Item.js');
+const ItemModel = require('../Models/Item.js');
 
 
 const router = express.Router();
@@ -65,6 +66,54 @@ router.post('/add-item', async(req,res)=>{
         if(err) res.status(400).json(err)
     }
 })
+
+
+router.get('/change-category-to-array',async(req,res)=>{
+
+    // Function to convert string to array
+    function convertStringToArray(str) {
+    // Check if it's already an array, return it directly
+    if (Array.isArray(str)) {
+        return str;
+    }
+
+    // Check if it's a string and then split it
+    if (typeof str === 'string') {
+        return str.split(',');
+    }
+
+    // For any other type or unexpected scenario, return an empty array
+    return [];
+    }
+
+
+    const items = await ItemModel.find({
+        $or: [
+            { category: { $type: 'string' } },
+            { category: { $type: 'array' } }
+        ]
+    });
+
+
+    try {
+    for(const item of items){
+        
+        const cat = convertStringToArray(item.category)
+
+        await item.updateOne(
+            {_id:item._id},
+            {$set:{category: cat}}
+        )
+    }
+    res.status(200).json("conversion complete")
+
+    } catch (error) {
+        console.error('Error occurred during conversion:', error);
+        res.status(400).json("conversion failed")
+
+    } 
+})
+
 
 
 router.delete("/delete-item", async (req, res) => {
