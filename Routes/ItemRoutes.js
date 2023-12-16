@@ -114,18 +114,43 @@ router.get('/change-category-to-array',async(req,res)=>{
     } 
 })
 
+router.put('/edit-item-by-id', async(req,res)=>{
+    const {id, name, price, longDescription, shortDescription} = req.body
 
+    try {
+        const updatedData = await ItemModel.findByIdAndUpdate(
+          id,
+          {
+            $set: {
+              name: name,
+              longDescription: longDescription,
+              shortDescription: shortDescription,
+              price: price,
+            },
+          },
+          { new: true }
+        );
+    
+        if (!updatedData) {
+          return res.status(404).json({ message: 'Data not found' });
+        }
+    
+        return res.status(200).json({ message: 'Data updated successfully', updatedData });
+      } catch (error) {
+        return res.status(500).json({ message: 'Server error', error: error.message });
+      }
+
+})
 
 router.delete("/delete-item", async (req, res) => {
     const id = req.body.id;
-    const item = await Item.findById(id);
 
-        try {
-          await item.delete();
-          res.status(200).json("Item has been deleted...");
-        } catch (err) {
-          res.status(500).json(err);
-        }
+    try {
+        const item = await Item.findByIdAndDelete(id);
+        res.status(200).json("Item has been deleted...");
+    } catch (err) {
+      res.status(500).json(err);
+    }
       
    
   });
