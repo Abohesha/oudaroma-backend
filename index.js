@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const bodyParser = require("body-parser")
 
 const ItemRoutes = require('./Routes/ItemRoutes')
+const UtilsRoutes = require('./Routes/UtilsRoutes')
 
 env.config();
 
@@ -16,6 +17,7 @@ app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
 app.use('/item', ItemRoutes);
+app.use('/utils', UtilsRoutes)
 
 mongoose.connect(process.env.MONGO_DB_URL, {
     useNewUrlParser:true,
